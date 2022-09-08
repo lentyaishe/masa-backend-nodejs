@@ -10,6 +10,7 @@ interface localWhiteBoardType {
 
 interface ISchoolService {
     getBoardTypes(): Promise<whiteBoardType[]>;
+    getBoardType(id: number): Promise<whiteBoardType>;
 }
 
 export class SchoolService implements ISchoolService {
@@ -35,6 +36,36 @@ export class SchoolService implements ISchoolService {
                                         this.parseLocalBoardType(whiteBoardType)
                                     );
                                 });
+                            }
+                            
+                            resolve(result);
+                        }
+                    })
+                }
+            });
+        });
+    }
+
+    public getBoardType(id: number): Promise<whiteBoardType> {
+        return new Promise<whiteBoardType>((resolve, reject) => {
+            let result: whiteBoardType;
+            const sql: SqlClient = require("msnodesqlv8");
+
+            sql.open(DB_CONNECTION_STRING, (connectionError: Error, connection: Connection) => {
+                if (connectionError) {
+                    reject(ErrorHelper.parseError(ErrorCodes.ConnectionError, ErrorMessages.DbConnectionError));
+                }
+                else {
+                    connection.query(`${Queries.WhiteBoardTypeById} ${id}`, (queryError: Error | undefined, queryResult: localWhiteBoardType[] | undefined) => {
+                        if (queryError) {
+                            reject(ErrorHelper.parseError(ErrorCodes.QueryError, ErrorMessages.SqlQueryError));
+                        }
+                        else {
+                            if (queryResult !== undefined && queryResult.length === 1) {
+                                result = this.parseLocalBoardType(queryResult[0]);
+                            }
+                            else if (queryResult !== undefined && queryResult.length === 0) {
+                                // TODO: Not found
                             }
                             
                             resolve(result);
