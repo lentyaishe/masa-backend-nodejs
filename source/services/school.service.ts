@@ -20,10 +20,7 @@ export class SchoolService implements ISchoolService {
         return new Promise<whiteBoardType[]>((resolve, reject) => {
             const result: whiteBoardType[] = [];
 
-            SqlHelper.openConnection()
-                .then((connection: Connection) => {
-                    return SqlHelper.executeQueryArrayResult<localWhiteBoardType>(connection, Queries.WhiteBoardTypes);
-                })
+            SqlHelper.executeQueryArrayResult<localWhiteBoardType>(Queries.WhiteBoardTypes)
                 .then((queryResult: localWhiteBoardType[]) => {
                     queryResult.forEach((whiteBoardType: localWhiteBoardType) => {
                         result.push(this.parseLocalBoardType(whiteBoardType));
@@ -39,10 +36,7 @@ export class SchoolService implements ISchoolService {
 
     public getBoardType(id: number): Promise<whiteBoardType> {
         return new Promise<whiteBoardType>((resolve, reject) => {
-            SqlHelper.openConnection()
-                .then((connection: Connection) => {
-                    return SqlHelper.executeQuerySingleResult<localWhiteBoardType>(connection, `${Queries.WhiteBoardTypeById} ${id}`);
-                })
+            SqlHelper.executeQuerySingleResult<localWhiteBoardType>(`${Queries.WhiteBoardTypeById} ${id}`)
                 .then((queryResult: localWhiteBoardType) => {
                     resolve(this.parseLocalBoardType(queryResult));
                 })
