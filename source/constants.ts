@@ -14,11 +14,15 @@ export class ErrorMessages {
     public static InputParameterNotSupplied: string = "Input parameter not supplied";
 }
 
+export class SqlParameters {
+    public static Id: string = "id";
+}
+
 export class Queries {
     public static WhiteBoardTypes: string = "SELECT * FROM white_board_type";
 
     // SELECT * FROM white_board_type WHERE id =  50
-    public static WhiteBoardTypeById: string = "SELECT * FROM white_board_type WHERE id = ";
+    public static WhiteBoardTypeById: string = `SELECT * FROM white_board_type WHERE id = ?`;
     public static WhiteBoardTypeByTitle: string = "SELECT * FROM white_board_type WHERE white_board_type LIKE ";
 }
 
