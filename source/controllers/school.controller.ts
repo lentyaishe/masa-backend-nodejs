@@ -42,35 +42,28 @@ const getBoardTypeById = async (req: Request, res: Response, next: NextFunction)
 };
 
 const updateBoardTypeById = async (req: Request, res: Response, next: NextFunction) => {
-    let id: number = -1;
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
+    if (typeof numericParamOrError === "number") {
+        if (numericParamOrError > 0) {
+            const body: whiteBoardType = req.body;
 
-    const sId: string = req.params.id;
-    if (isNaN(Number(sId))) {
-        const nonNumericError: systemError = ErrorHelper.createError(ErrorCodes.NonNumericInput, ErrorMessages.NonNumericInput);
-        return ResponseHelper.handleError(res, nonNumericError);
-    }
-
-    if (sId !== null && sId !== undefined) {
-        id = parseInt(sId);
-    }
-    else {
-        const noInputParameteterError: systemError = ErrorHelper.createError(ErrorCodes.InputParameterNotSupplied, ErrorMessages.InputParameterNotSupplied);
-        return ResponseHelper.handleError(res, noInputParameteterError);
-    }
-
-    
-    
-    if (id > 0) {
-        schoolService.getBoardTypeById(id)
-            .then((result: whiteBoardType) => {
-                return res.status(200).json(result);
+            schoolService.updateBoardTypeById({
+                id: numericParamOrError,
+                type: body.type
             })
+                .then(() => {
+                    return res.sendStatus(200);
+                })
             .catch((error: systemError) => {
-                return ResponseHelper.handleError(res, error);
-            });
+                    return ResponseHelper.handleError(res, error);
+                });
+        }
+        else {
+            // TODO: Error handling
+        }
     }
     else {
-        // TODO: Error handling
+        return ResponseHelper.handleError(res, numericParamOrError);
     }
 };
 
