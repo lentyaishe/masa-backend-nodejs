@@ -22,17 +22,14 @@ export class SchoolService implements ISchoolService {
 
             SqlHelper.openConnection()
                 .then((connection: Connection) => {
-                    SqlHelper.executeQueryArrayResult<localWhiteBoardType>(connection, Queries.WhiteBoardTypes)
-                        .then((queryResult: localWhiteBoardType[]) => {
-                            queryResult.forEach((whiteBoardType: localWhiteBoardType) => {
-                                result.push(this.parseLocalBoardType(whiteBoardType));
-                            });
+                    return SqlHelper.executeQueryArrayResult<localWhiteBoardType>(connection, Queries.WhiteBoardTypes);
+                })
+                .then((queryResult: localWhiteBoardType[]) => {
+                    queryResult.forEach((whiteBoardType: localWhiteBoardType) => {
+                        result.push(this.parseLocalBoardType(whiteBoardType));
+                    });
 
-                            resolve(result);
-                        })
-                        .catch((error: systemError) => {
-                            reject(error);
-                        });
+                    resolve(result);
                 })
                 .catch((error: systemError) => {
                     reject(error);
@@ -44,13 +41,10 @@ export class SchoolService implements ISchoolService {
         return new Promise<whiteBoardType>((resolve, reject) => {
             SqlHelper.openConnection()
                 .then((connection: Connection) => {
-                    SqlHelper.executeQuerySingleResult<localWhiteBoardType>(connection, `${Queries.WhiteBoardTypeById} ${id}`)
-                        .then((queryResult: localWhiteBoardType) => {
-                            resolve(this.parseLocalBoardType(queryResult));
-                        })
-                        .catch((error: systemError) => {
-                            reject(error);
-                        });
+                    return SqlHelper.executeQuerySingleResult<localWhiteBoardType>(connection, `${Queries.WhiteBoardTypeById} ${id}`);
+                })
+                .then((queryResult: localWhiteBoardType) => {
+                    resolve(this.parseLocalBoardType(queryResult));
                 })
                 .catch((error: systemError) => {
                     reject(error);
