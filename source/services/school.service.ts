@@ -1,7 +1,6 @@
-import { Connection, SqlClient, Error } from "msnodesqlv8";
-import { DB_CONNECTION_STRING, ErrorCodes, ErrorMessages, Queries } from "../constants";
+import * as _ from "underscore";
+import { Queries } from "../constants";
 import { systemError, whiteBoardType } from "../entities";
-import { ErrorHelper } from "../helpers/error.helper";
 import { SqlHelper } from "../helpers/sql.helper";
 
 interface localWhiteBoardType {
@@ -11,7 +10,7 @@ interface localWhiteBoardType {
 
 interface ISchoolService {
     getBoardTypes(): Promise<whiteBoardType[]>;
-    getBoardType(id: number): Promise<whiteBoardType>;
+    getBoardTypeById(id: number): Promise<whiteBoardType>;
 }
 
 export class SchoolService implements ISchoolService {
@@ -34,11 +33,24 @@ export class SchoolService implements ISchoolService {
         });
     }
 
-    public getBoardType(id: number): Promise<whiteBoardType> {
+    public getBoardTypeById(id: number): Promise<whiteBoardType> {
         return new Promise<whiteBoardType>((resolve, reject) => {
             SqlHelper.executeQuerySingleResult<localWhiteBoardType>(`${Queries.WhiteBoardTypeById} ${id}`)
                 .then((queryResult: localWhiteBoardType) => {
                     resolve(this.parseLocalBoardType(queryResult));
+                })
+                .catch((error: systemError) => {
+                    reject(error);
+                });
+        });
+    }
+
+    public getBoardTypeByTitle(title: string): Promise<whiteBoardType[]> {
+        return new Promise<whiteBoardType[]>((resolve, reject) => {
+            const query: string = `${Queries.WhiteBoardTypeByTitle} '%${title}%'`;
+            SqlHelper.executeQueryArrayResult<localWhiteBoardType>(query)
+                .then((queryResult: localWhiteBoardType[]) => {
+                    resolve(_.map(queryResult, (result: localWhiteBoardType) => this.parseLocalBoardType(result)));
                 })
                 .catch((error: systemError) => {
                     reject(error);
