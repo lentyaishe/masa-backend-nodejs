@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ErrorCodes, ErrorMessages } from '../constants';
+import { NON_EXISTENT_ID } from '../constants';
 import { systemError, whiteBoardType } from '../entities';
-import { ErrorHelper } from '../helpers/error.helper';
 import { RequestHelper } from '../helpers/request.helper';
 import { ResponseHelper } from '../helpers/response.helper';
 import { SchoolService } from '../services/school.service';
@@ -67,6 +66,21 @@ const updateBoardTypeById = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
+const addBoardType = async (req: Request, res: Response, next: NextFunction) => {
+    const body: whiteBoardType = req.body;
+
+    schoolService.addBoardType({
+        id: NON_EXISTENT_ID,
+        type: body.type
+    })
+        .then((result: whiteBoardType) => {
+            return res.status(200).json(result);
+        })
+        .catch((error: systemError) => {
+            return ResponseHelper.handleError(res, error);
+        });
+};
+
 // SQL injection made by sending the following as a parameter: <' OR 1=1 -- >
 const getBoardTypeByTitle = async (req: Request, res: Response, next: NextFunction) => {
     let title: string = req.params.title;
@@ -80,4 +94,4 @@ const getBoardTypeByTitle = async (req: Request, res: Response, next: NextFuncti
         });
 };
 
-export default { getBoardTypes, getBoardTypeById, getBoardTypeByTitle, updateBoardTypeById };
+export default { getBoardTypes, getBoardTypeById, getBoardTypeByTitle, updateBoardTypeById, addBoardType };
