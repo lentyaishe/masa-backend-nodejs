@@ -12,6 +12,7 @@ interface ISchoolService {
     getBoardTypes(): Promise<whiteBoardType[]>;
     getBoardTypeById(id: number): Promise<whiteBoardType>;
     updateBoardTypeById(whiteBoardType: whiteBoardType): Promise<void>;
+    addBoardType(whiteBoardType: whiteBoardType): Promise<whiteBoardType>;
 }
 
 export class SchoolService implements ISchoolService {
@@ -51,6 +52,18 @@ export class SchoolService implements ISchoolService {
             SqlHelper.executeQueryNoResult(Queries.UpdateWhiteBoardTypeById, whiteBoardType.type, whiteBoardType.id)
                 .then(() => {
                     resolve();
+                })
+                .catch((error: systemError) => {
+                    reject(error);
+                });
+        });
+    }
+
+    public addBoardType(whiteBoardType: whiteBoardType): Promise<whiteBoardType> {
+        return new Promise<whiteBoardType>((resolve, reject) => {
+            SqlHelper.createNew<whiteBoardType>(Queries.AddWhiteBoardType, whiteBoardType, whiteBoardType.type)
+                .then((result: whiteBoardType) => {
+                    resolve(result);
                 })
                 .catch((error: systemError) => {
                     reject(error);

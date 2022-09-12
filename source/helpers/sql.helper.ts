@@ -1,5 +1,5 @@
-import { Connection, SqlClient, Error, ConnectDescription, Query } from "msnodesqlv8";
-import { DB_CONNECTION_STRING, ErrorCodes, ErrorMessages, SqlParameters } from "../constants";
+import { Connection, SqlClient, Error, Query } from "msnodesqlv8";
+import { DB_CONNECTION_STRING, ErrorCodes, ErrorMessages, Queries } from "../constants";
 import { systemError } from "../entities";
 import { ErrorHelper } from "./error.helper";
 
@@ -92,6 +92,44 @@ export class SqlHelper {
                 .catch((error: systemError) => {
                     reject(error);
                 });
+        });
+    }
+
+    public static createNew<T>(query: string, original: T, ...params: (string | number)[]): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            SqlHelper.openConnection()
+                .then((connection: Connection) => {
+                    const queries: string[] = [query, Queries.SelectIdentity];
+                    const executedQuery: string = queries.join(";");
+                    let executionCounter: number = 0;
+                    connection.query(executedQuery, params, (queryError: Error | undefined, queryResult: T[] | undefined) => {
+                        if (queryError) {
+                            reject(ErrorHelper.createError(ErrorCodes.QueryError, ErrorMessages.SqlQueryError));
+                        }
+                        else {
+                            executionCounter++;
+                            const badQueryError: systemError = ErrorHelper.createError(ErrorCodes.QueryError, ErrorMessages.SqlQueryError);
+
+                            if (executionCounter === queries.length) {
+                                if (queryResult !== undefined) {
+                                    if (queryResult.length === 1) {
+                                        (original as any).id = (queryResult[0] as any).id;
+                                        resolve(original);
+                                    }
+                                    else {
+                                        reject(badQueryError);
+                                    }
+                                }
+                                else {
+                                    reject(badQueryError);
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch((error: systemError) => {
+                    reject(error);
+                })
         });
     }
 
