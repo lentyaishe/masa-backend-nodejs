@@ -76,11 +76,19 @@ export class SqlHelper {
                 .then((connection: Connection) => {
                     const q: Query = connection.query(query, params, (queryError: Error | undefined) => {
                         if (queryError) {
-                            reject(ErrorHelper.createError(ErrorCodes.QueryError, ErrorMessages.SqlQueryError));
+                            switch (queryError.code) {
+                                case 547:
+                                    reject(ErrorHelper.createError(ErrorCodes.DeletionConflict, ErrorMessages.DeletionConflict));
+                                   break;
+                                default:
+                                    reject(ErrorHelper.createError(ErrorCodes.QueryError, ErrorMessages.SqlQueryError));
+                                    break;
+                            }
                         }
                     });
 
                     q.on('rowcount', (rowCount: number) => {
+                        // If not ignoring rows affected AND ALSO rows affected equals zero then
                         if (!ignoreNoRowsAffected && rowCount === 0) {
                             reject(ErrorHelper.createError(ErrorCodes.NoData, ErrorMessages.NoDataFound));
                             return;
