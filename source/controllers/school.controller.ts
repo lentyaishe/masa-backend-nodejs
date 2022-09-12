@@ -54,7 +54,7 @@ const updateBoardTypeById = async (req: Request, res: Response, next: NextFuncti
                 .then(() => {
                     return res.sendStatus(200);
                 })
-            .catch((error: systemError) => {
+                .catch((error: systemError) => {
                     return ResponseHelper.handleError(res, error);
                 });
         }
