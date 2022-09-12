@@ -11,7 +11,7 @@ const getBoardTypes = async (req: Request, res: Response, next: NextFunction) =>
     schoolService.getBoardTypes()
         .then((result: whiteBoardType[]) => {
             return res.status(200).json({
-                message: result
+                types: result
             });
         })
         .catch((error: systemError) => {
