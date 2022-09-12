@@ -13,6 +13,7 @@ interface ISchoolService {
     getBoardTypeById(id: number): Promise<whiteBoardType>;
     updateBoardTypeById(whiteBoardType: whiteBoardType): Promise<whiteBoardType>;
     addBoardType(whiteBoardType: whiteBoardType): Promise<whiteBoardType>;
+    deleteBoardTypeById(id: number): Promise<void>;
 }
 
 export class SchoolService implements ISchoolService {
@@ -49,7 +50,7 @@ export class SchoolService implements ISchoolService {
 
     public updateBoardTypeById(whiteBoardType: whiteBoardType): Promise<whiteBoardType> {
         return new Promise<whiteBoardType>((resolve, reject) => {
-            SqlHelper.executeQueryNoResult(Queries.UpdateWhiteBoardTypeById, whiteBoardType.type, whiteBoardType.id)
+            SqlHelper.executeQueryNoResult(Queries.UpdateWhiteBoardTypeById, false, whiteBoardType.type, whiteBoardType.id)
                 .then(() => {
                     resolve(whiteBoardType);
                 })
@@ -64,6 +65,18 @@ export class SchoolService implements ISchoolService {
             SqlHelper.createNew<whiteBoardType>(Queries.AddWhiteBoardType, whiteBoardType, whiteBoardType.type)
                 .then((result: whiteBoardType) => {
                     resolve(result);
+                })
+                .catch((error: systemError) => {
+                    reject(error);
+                });
+        });
+    }
+
+    public deleteBoardTypeById(id: number): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            SqlHelper.executeQueryNoResult(Queries.DeleteWhiteBoardTypeById, true, id)
+                .then(() => {
+                    resolve();
                 })
                 .catch((error: systemError) => {
                     reject(error);
