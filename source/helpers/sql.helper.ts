@@ -70,7 +70,7 @@ export class SqlHelper {
         });
     }
 
-    public static executeQueryNoResult(query: string, ...params: (string | number)[]): Promise<void> {
+    public static executeQueryNoResult(query: string, ignoreNoRowsAffected: boolean, ...params: (string | number)[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             SqlHelper.openConnection()
                 .then((connection: Connection) => {
@@ -81,7 +81,7 @@ export class SqlHelper {
                     });
 
                     q.on('rowcount', (rowCount: number) => {
-                        if (rowCount === 0) {
+                        if (!ignoreNoRowsAffected && rowCount === 0) {
                             reject(ErrorHelper.createError(ErrorCodes.NoData, ErrorMessages.NoDataFound));
                             return;
                         }
