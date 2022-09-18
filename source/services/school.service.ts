@@ -45,7 +45,7 @@ export class SchoolService implements ISchoolService {
 
     public getBoardTypeById(id: number): Promise<whiteBoardType> {
         return new Promise<whiteBoardType>((resolve, reject) => {
-            SqlHelper.executeQuerySingleResult<localWhiteBoardType>(Queries.WhiteBoardTypeById, id)
+            SqlHelper.executeQuerySingleResult<localWhiteBoardType>(Queries.WhiteBoardTypeById, id, Status.Active)
                 .then((queryResult: localWhiteBoardType) => {
                     resolve(this.parseLocalBoardType(queryResult));
                 })
