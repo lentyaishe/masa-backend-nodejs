@@ -1,5 +1,8 @@
-export interface whiteBoardType {
+export interface entityWithId {
     id: number;
+}
+
+export interface whiteBoardType extends entityWithId {
     type: string;
 }
 
