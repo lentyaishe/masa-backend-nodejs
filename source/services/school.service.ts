@@ -71,7 +71,9 @@ export class SchoolService implements ISchoolService {
 
     public addBoardType(whiteBoardType: whiteBoardType): Promise<whiteBoardType> {
         return new Promise<whiteBoardType>((resolve, reject) => {
-            SqlHelper.createNew<whiteBoardType>(Queries.AddWhiteBoardType, whiteBoardType, whiteBoardType.type)
+            const createDate: string = DateHelper.dateToString(new Date());
+            const createUser: number = TEMP_USER_ID;
+            SqlHelper.createNew<whiteBoardType>(Queries.AddWhiteBoardType, whiteBoardType, whiteBoardType.type, createDate, createDate, createUser, createUser, Status.Active)
                 .then((result: whiteBoardType) => {
                     resolve(result);
                 })
