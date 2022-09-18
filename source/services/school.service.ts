@@ -1,6 +1,6 @@
 import * as _ from "underscore";
 import { Queries, TEMP_USER_ID } from "../constants";
-import { systemError, whiteBoardType } from "../entities";
+import { entityWithId, systemError, whiteBoardType } from "../entities";
 import { Status } from "../enums";
 import { DateHelper } from "../helpers/date.helper";
 import { SqlHelper } from "../helpers/sql.helper";
@@ -73,9 +73,9 @@ export class SchoolService implements ISchoolService {
         return new Promise<whiteBoardType>((resolve, reject) => {
             const createDate: string = DateHelper.dateToString(new Date());
             const createUser: number = TEMP_USER_ID;
-            SqlHelper.createNew<whiteBoardType>(Queries.AddWhiteBoardType, whiteBoardType, whiteBoardType.type, createDate, createDate, createUser, createUser, Status.Active)
-                .then((result: whiteBoardType) => {
-                    resolve(result);
+            SqlHelper.createNew(Queries.AddWhiteBoardType, whiteBoardType, whiteBoardType.type, createDate, createDate, createUser, createUser, Status.Active)
+                .then((result: entityWithId) => {
+                    resolve(result as whiteBoardType);
                 })
                 .catch((error: systemError) => {
                     reject(error);
