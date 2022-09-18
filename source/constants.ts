@@ -27,7 +27,7 @@ export class Queries {
     public static SelectIdentity: string = "SELECT SCOPE_IDENTITY() AS id;";
 
     // SELECT * FROM white_board_type WHERE id =  50
-    public static WhiteBoardTypeById: string = `SELECT * FROM white_board_type WHERE id = ?`;
+    public static WhiteBoardTypeById: string = `SELECT * FROM white_board_type WHERE id = ? AND status_id = ?`;
     public static WhiteBoardTypeByTitle: string = "SELECT * FROM white_board_type WHERE white_board_type LIKE ?";
     public static UpdateWhiteBoardTypeById: string = "UPDATE white_board_type SET white_board_type = ? WHERE id = ?";
     public static AddWhiteBoardType: string = "INSERT white_board_type (white_board_type) VALUES (?)";
