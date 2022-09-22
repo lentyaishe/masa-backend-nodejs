@@ -52,7 +52,7 @@ const updateBoardTypeById = async (req: Request, res: Response, next: NextFuncti
             schoolService.updateBoardTypeById({
                 id: numericParamOrError,
                 type: body.type
-            })
+            }, (req as any).userId)
                 .then((result: whiteBoardType) => {
                     return res.status(200).json(result);
                 })
@@ -75,7 +75,7 @@ const addBoardType = async (req: Request, res: Response, next: NextFunction) => 
     schoolService.addBoardType({
         id: NON_EXISTENT_ID,
         type: body.type
-    })
+    }, (req as any).userId)
         .then((result: whiteBoardType) => {
             return res.status(200).json(result);
         })
@@ -88,7 +88,7 @@ const deleteBoardTypeById = async (req: Request, res: Response, next: NextFuncti
     const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
-            schoolService.deleteBoardTypeById(numericParamOrError)
+            schoolService.deleteBoardTypeById(numericParamOrError, (req as any).userId)
                 .then(() => {
                     return res.sendStatus(200);
                 })
