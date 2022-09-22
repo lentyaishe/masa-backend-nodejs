@@ -2,14 +2,10 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from 'express';
 import { TOKEN_SECRET } from "../constants";
 import { Role } from "../enums";
-
-interface AuthenticatedRequest extends Request {
-    userId: number;
-}
+import { AuthenticatedRequest, jwtUserData } from "../entities";
 
 interface jwtBase {
-    userId: number;
-    roleId: number;
+    userData: jwtUserData;
     exp: number;
     iat: number;
 }
@@ -25,10 +21,10 @@ const verifyToken = (roles: Role[]) => (req: Request, res: Response, next: NextF
         // 'Bearer ..............'
         token = token.substring("Bearer ".length);
         const decoded: string | JwtPayload = jwt.verify(token, TOKEN_SECRET);
-        if (roles.indexOf((decoded as jwtBase).roleId) === -1) {
+        if (roles.indexOf((decoded as jwtBase).userData.roleId) === -1) {
             return res.sendStatus(401);
         } 
-        (req as AuthenticatedRequest).userId = (decoded as jwtBase).userId;
+        (req as AuthenticatedRequest).userData = (decoded as jwtBase).userData;
     } catch (err) {
         return res.status(401).send("Invalid Token");
     }
