@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from "jsonwebtoken";
 import { ErrorService } from '../services/error.service';
 import { AuthenticationService } from '../services/authentication.service';
-import { systemError } from '../entities';
+import { jwtUserData, systemError } from '../entities';
 import { ResponseHelper } from '../helpers/response.helper';
+import { TOKEN_SECRET } from '../constants';
 
 interface localUser {
     login: string;
@@ -17,8 +19,17 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
     authenticationService.login(user.login, user.password)
         .then((id: number) => {
-            // TODO: Generate JWT token
-            const token: string = "1";
+            const jwtUser: jwtUserData = {
+                userId: id
+            };
+
+            const token: string = jwt.sign(
+                jwtUser,
+                TOKEN_SECRET,
+                {
+                    expiresIn: "2h",
+                });
+
             return res.status(200).json({
                 token: token
             });
