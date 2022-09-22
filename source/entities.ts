@@ -1,4 +1,4 @@
-import { AppError } from "./enums";
+import { AppError, Role } from "./enums";
 
 export interface entityWithId {
     id: number;
@@ -22,4 +22,5 @@ export interface sqlParameter {
 
 export interface jwtUserData {
     userId: number;
+    roleId: Role;
 }
