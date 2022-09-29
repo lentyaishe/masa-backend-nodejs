@@ -131,20 +131,7 @@ export class SqlHelper {
                             executionCounter++; // executionCounter = executionCounter + 1;
 
                             if (executionCounter === queries.length) {
-                                const badQueryError: systemError = errorService.getError(AppError.QueryError);
-
-                                if (queryResult !== undefined) {
-                                    if (queryResult.length === 1) {
-                                        original.id = queryResult[0].id;
-                                        resolve(original);
-                                    }
-                                    else {
-                                        reject(badQueryError);
-                                    }
-                                }
-                                else {
-                                    reject(badQueryError);
-                                }
+                                SqlHelper.treatInsertResult(errorService, original, queryResult, resolve, reject);
                             }
                         }
                     });
@@ -155,19 +142,30 @@ export class SqlHelper {
         });
     }
 
-    public static executeStoredProcedure(errorService: ErrorService, procedureName: string, ...params: (string | number)[]): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            SqlHelper.sql.open(DB_CONNECTION_STRING, (connectionError: Error, connection: Connection) => {
-                const pm: ProcedureManager = connection.procedureMgr();
-                pm.callproc(procedureName, params, (storedProcedureError: Error | undefined, results: any[] | undefined, output: any[] | undefined) => {
-                    if (storedProcedureError) {
-                        reject(errorService.getError(AppError.QueryError));
-                    }
-                    else {
-                        resolve();
-                    }
+    public static executeStoredProcedure(errorService: ErrorService, procedureName: string, original: entityWithId, ...params: (string | number)[]): Promise<entityWithId> {
+        return new Promise<entityWithId>((resolve, reject) => {
+            SqlHelper.openConnection(errorService)
+                .then((connection) => {
+                    const pm: ProcedureManager = connection.procedureMgr();
+                    pm.callproc(procedureName, params, (storedProcedureError: Error | undefined, results: entityWithId[] | undefined, output: any[] | undefined) => {
+                        if (storedProcedureError) {
+                            reject(errorService.getError(AppError.QueryError));
+                        }
+                        else {
+                            const id: number | null = SqlHelper.treatInsertResult2(results);
+                            if (id !== null) {
+                                original.id = id;
+                                resolve(original);
+                            }
+                            else {
+                                reject(errorService.getError(AppError.QueryError));
+                            }
+                        }
+                    });
+                })
+                .catch((error: systemError) => {
+                    reject(error);
                 });
-            });
         });
     }
 
@@ -182,5 +180,36 @@ export class SqlHelper {
                 }
             });
         });
+    }
+
+    private static treatInsertResult(errorService: ErrorService, original: entityWithId, queryResult: entityWithId[] | undefined, resolve: (result: entityWithId) => void, reject: (error: systemError) => void): void {
+        const badQueryError: systemError = errorService.getError(AppError.QueryError);
+
+        if (queryResult !== undefined) {
+            if (queryResult.length === 1) {
+                original.id = queryResult[0].id;
+                resolve(original);
+            }
+            else {
+                reject(badQueryError);
+            }
+        }
+        else {
+            reject(badQueryError);
+        }
+    }
+
+    private static treatInsertResult2(queryResult: entityWithId[] | undefined): number | null {
+        if (queryResult !== undefined) {
+            if (queryResult.length === 1) {
+                return queryResult[0].id;
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
+        }
     }
 }
