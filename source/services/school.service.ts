@@ -95,7 +95,7 @@ export class SchoolService implements ISchoolService {
 
     public addBoardTypeByStoredProcedure(whiteBoardType: whiteBoardType, userId: number): Promise<whiteBoardType> {
         return new Promise<whiteBoardType>((resolve, reject) => {
-            SqlHelper.executeStoredProcedure(this._errorService, StoredProcedures.AddWhiteBoardType, whiteBoardType.type, userId)
+            SqlHelper.executeStoredProcedure(this._errorService, StoredProcedures.AddWhiteBoardType, whiteBoardType, whiteBoardType.type, userId)
                 .then(() => {
                     resolve(whiteBoardType);
                 })
