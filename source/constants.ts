@@ -22,6 +22,7 @@ export class Queries {
 
 export class StoredProcedures {
     public static AddWhiteBoardType: string = "sp_create_board_type";
+    public static AddWhiteBoardTypeOutput: string = "sp_create_board_type_output";
 }
 
 // export const DB_CONNECTION_STRING: string = "server=.;Database=masa_school;Trusted_Connection=Yes;Driver={SQL Server Native Client 11.0}";

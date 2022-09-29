@@ -169,6 +169,33 @@ export class SqlHelper {
         });
     }
 
+    public static executeStoredProcedureWithOutput(errorService: ErrorService, procedureName: string, original: entityWithId, ...params: (string | number)[]): Promise<entityWithId> {
+        return new Promise<entityWithId>((resolve, reject) => {
+            SqlHelper.openConnection(errorService)
+                .then((connection) => {
+                    const pm: ProcedureManager = connection.procedureMgr();
+                    params.push(original.id);
+                    pm.callproc(procedureName, params, (storedProcedureError: Error | undefined, results: any[] | undefined, output: number[] | undefined) => {
+                        if (storedProcedureError) {
+                            reject(errorService.getError(AppError.QueryError));
+                        }
+                        else {
+                            if (output?.length === 2) {
+                                original.id = output[1];
+                                resolve(original);
+                            }
+                            else {
+                                reject(errorService.getError(AppError.QueryError));
+                            }
+                        }
+                    });
+                })
+                .catch((error: systemError) => {
+                    reject(error);
+                });
+        });
+    }
+
     private static openConnection(errorService: ErrorService): Promise<Connection> {
         return new Promise<Connection>((resolve, reject) => {
             SqlHelper.sql.open(DB_CONNECTION_STRING, (connectionError: Error, connection: Connection) => {

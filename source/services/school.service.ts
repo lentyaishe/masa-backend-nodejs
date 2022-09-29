@@ -24,6 +24,7 @@ interface ISchoolService {
     updateBoardTypeById(whiteBoardType: whiteBoardType, userId: number): Promise<whiteBoardType>;
     addBoardType(whiteBoardType: whiteBoardType, userId: number): Promise<whiteBoardType>;
     addBoardTypeByStoredProcedure(whiteBoardType: whiteBoardType, userId: number): Promise<whiteBoardType>;
+    addBoardTypeByStoredProcedureOutput(whiteBoardType: whiteBoardType, userId: number): Promise<whiteBoardType>;
     deleteBoardTypeById(id: number, userId: number): Promise<void>;
 }
 
@@ -96,6 +97,18 @@ export class SchoolService implements ISchoolService {
     public addBoardTypeByStoredProcedure(whiteBoardType: whiteBoardType, userId: number): Promise<whiteBoardType> {
         return new Promise<whiteBoardType>((resolve, reject) => {
             SqlHelper.executeStoredProcedure(this._errorService, StoredProcedures.AddWhiteBoardType, whiteBoardType, whiteBoardType.type, userId)
+                .then(() => {
+                    resolve(whiteBoardType);
+                })
+                .catch((error: systemError) => {
+                    reject(error);
+                });
+        });
+    }
+
+    public addBoardTypeByStoredProcedureOutput(whiteBoardType: whiteBoardType, userId: number): Promise<whiteBoardType> {
+        return new Promise<whiteBoardType>((resolve, reject) => {
+            SqlHelper.executeStoredProcedureWithOutput(this._errorService, StoredProcedures.AddWhiteBoardTypeOutput, whiteBoardType, whiteBoardType.type, userId)
                 .then(() => {
                     resolve(whiteBoardType);
                 })
