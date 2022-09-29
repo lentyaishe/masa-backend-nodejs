@@ -1,4 +1,4 @@
-import { Connection, SqlClient, Error, Query } from "msnodesqlv8";
+import { Connection, SqlClient, Error, Query, ProcedureManager, RawData } from "msnodesqlv8";
 import { DB_CONNECTION_STRING, Queries } from "../constants";
 import { entityWithId, systemError } from "../entities";
 import { AppError } from "../enums";
@@ -80,7 +80,7 @@ export class SqlHelper {
                             switch (queryError.code) {
                                 case 547:
                                     reject(errorService.getError(AppError.DeletionConflict));
-                                   break;
+                                    break;
                                 default:
                                     reject(errorService.getError(AppError.QueryError));
                                     break;
@@ -94,9 +94,21 @@ export class SqlHelper {
                             reject(errorService.getError(AppError.NoData));
                             return;
                         }
-
+                        
                         resolve();
                     });
+
+                    // WITHOUT return after reject()
+                    // q.on('rowcount', (rowCount: number) => {
+                    //     // If not ignoring rows affected AND ALSO rows affected equals zero then
+                    //     if (!ignoreNoRowsAffected && rowCount === 0) {
+                    //         reject(errorService.getError(AppError.NoData));
+                    //         // since the body of the callback is finished here no need in return
+                    //     }
+                    //     else {
+                    //         resolve();
+                    //     }
+                    // });
                 })
                 .catch((error: systemError) => {
                     reject(error);
@@ -109,17 +121,18 @@ export class SqlHelper {
             SqlHelper.openConnection(errorService)
                 .then((connection: Connection) => {
                     const queries: string[] = [query, Queries.SelectIdentity];
-                    const executedQuery: string = queries.join(";");
+                    const combinedQuery: string = queries.join(";");
                     let executionCounter: number = 0;
-                    connection.query(executedQuery, params, (queryError: Error | undefined, queryResult: entityWithId[] | undefined) => {
+                    connection.query(combinedQuery, params, (queryError: Error | undefined, queryResult: entityWithId[] | undefined) => {
                         if (queryError) {
                             reject(errorService.getError(AppError.QueryError));
                         }
                         else {
-                            executionCounter++;
-                            const badQueryError: systemError = errorService.getError(AppError.QueryError);
+                            executionCounter++; // executionCounter = executionCounter + 1;
 
                             if (executionCounter === queries.length) {
+                                const badQueryError: systemError = errorService.getError(AppError.QueryError);
+
                                 if (queryResult !== undefined) {
                                     if (queryResult.length === 1) {
                                         original.id = queryResult[0].id;
@@ -142,6 +155,22 @@ export class SqlHelper {
         });
     }
 
+    public static executeStoredProcedure(errorService: ErrorService, procedureName: string, ...params: (string | number)[]): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            SqlHelper.sql.open(DB_CONNECTION_STRING, (connectionError: Error, connection: Connection) => {
+                const pm: ProcedureManager = connection.procedureMgr();
+                pm.callproc(procedureName, params, (storedProcedureError: Error | undefined, results: any[] | undefined, output: any[] | undefined) => {
+                    if (storedProcedureError) {
+                        reject(errorService.getError(AppError.QueryError));
+                    }
+                    else {
+                        resolve();
+                    }
+                });
+            });
+        });
+    }
+
     private static openConnection(errorService: ErrorService): Promise<Connection> {
         return new Promise<Connection>((resolve, reject) => {
             SqlHelper.sql.open(DB_CONNECTION_STRING, (connectionError: Error, connection: Connection) => {
@@ -149,7 +178,7 @@ export class SqlHelper {
                     reject(errorService.getError(AppError.ConnectionError));
                 }
                 else {
-                    resolve(connection);
+                    resolve(connection)
                 }
             });
         });

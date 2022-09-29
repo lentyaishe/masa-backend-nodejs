@@ -84,6 +84,21 @@ const addBoardType = async (req: Request, res: Response, next: NextFunction) => 
         });
 };
 
+const addBoardTypeByStoredProcedure = async (req: Request, res: Response, next: NextFunction) => {
+    const body: whiteBoardType = req.body;
+
+    schoolService.addBoardTypeByStoredProcedure({
+        id: NON_EXISTENT_ID,
+        type: body.type
+    }, (req as AuthenticatedRequest).userData.userId)
+        .then((result: whiteBoardType) => {
+            return res.status(200).json(result);
+        })
+        .catch((error: systemError) => {
+            return ResponseHelper.handleError(res, error);
+        });
+};
+
 const deleteBoardTypeById = async (req: Request, res: Response, next: NextFunction) => {
     const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
     if (typeof numericParamOrError === "number") {
@@ -118,4 +133,4 @@ const getBoardTypeByTitle = async (req: Request, res: Response, next: NextFuncti
         });
 };
 
-export default { getBoardTypes, getBoardTypeById, getBoardTypeByTitle, updateBoardTypeById, addBoardType, deleteBoardTypeById };
+export default { getBoardTypes, getBoardTypeById, getBoardTypeByTitle, updateBoardTypeById, addBoardType, addBoardTypeByStoredProcedure, deleteBoardTypeById };

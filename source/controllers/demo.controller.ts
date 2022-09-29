@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { DemoHelper } from '../helpers/demo.helper';
 
 const getHelloWorld = async (req: Request, res: Response, next: NextFunction) => {
     return res.status(200).json({
@@ -12,6 +13,48 @@ const getWithTimeout = async (req: Request, res: Response, next: NextFunction) =
             message: "Timeout in 1 second"
         });
     }, 1000);
+};
+
+const getWithDoubleTimeout = (req: Request, res: Response, next: NextFunction) => {
+    DemoHelper.doubleWait(5, 7)
+        .then(() => {
+            console.log("All complete");
+            
+            return res.status(200).json({
+                message: "Double timeout"
+            });
+        })
+        .catch((error) => {
+            // handle me
+        });
+};
+
+const getWithDoubleTimeoutChained = (req: Request, res: Response, next: NextFunction) => {
+    DemoHelper.doubleWaitChainedPromise(5, 7)
+        .then(() => {
+            console.log("All complete");
+            
+            return res.status(200).json({
+                message: "Double timeout chained"
+            });
+        })
+        .catch((error) => {
+            // handle me
+        });
+};
+
+const getWithDoubleTimeoutParallel = (req: Request, res: Response, next: NextFunction) => {
+    DemoHelper.doubleWaitParallel(5, 7)
+        .then(() => {
+            console.log("All complete");
+            
+            return res.status(200).json({
+                message: "Double timeout chained"
+            });
+        })
+        .catch((error) => {
+            // handle me
+        });
 };
 
 const getWithDelay = async (req: Request, res: Response, next: NextFunction) => {
@@ -48,4 +91,4 @@ const getWithDelayValidated = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export default { getHelloWorld, getWithTimeout, getWithDelay, getWithDelayValidated };
+export default { getHelloWorld, getWithTimeout, getWithDelay, getWithDelayValidated, getWithDoubleTimeout, getWithDoubleTimeoutChained, getWithDoubleTimeoutParallel };
