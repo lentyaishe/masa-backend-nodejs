@@ -1,4 +1,4 @@
-import { Connection, SqlClient, Error, Query, ProcedureManager, RawData } from "msnodesqlv8";
+import { Connection, SqlClient, Error, Query, ProcedureManager } from "msnodesqlv8";
 import { DB_CONNECTION_STRING, Queries } from "../constants";
 import { entityWithId, systemError } from "../entities";
 import { AppError } from "../enums";
@@ -33,41 +33,37 @@ export class SqlHelper {
         });
     }
 
-    public static executeQuerySingleResult<T>(errorService: ErrorService, query: string, ...params: (string | number)[]): Promise<T> {
-        return new Promise<T>((resolve, reject) => {
-            SqlHelper.openConnection(errorService)
-                .then((connection: Connection) => {
-                    connection.query(query, params, (queryError: Error | undefined, queryResult: T[] | undefined) => {
-                        if (queryError) {
-                            reject(errorService.getError(AppError.QueryError));
-                        }
-                        else {
-                            const notFoundError: systemError = errorService.getError(AppError.NoData);
+    public static async executeQuerySingleResult<T>(errorService: ErrorService, query: string, ...params: (string | number)[]): Promise<T> {
+        return new Promise<T>(async (resolve, reject) => {
+            const connection: Connection = await SqlHelper.openConnection(errorService);
+
+            connection.query(query, params, (queryError: Error | undefined, queryResult: T[] | undefined) => {
+                if (queryError) {
+                    reject(errorService.getError(AppError.QueryError));
+                }
+                else {
+                    const notFoundError: systemError = errorService.getError(AppError.NoData);
                     
-                            if (queryResult !== undefined) {
-                                switch (queryResult.length) {
-                                    case 0:
-                                        reject(notFoundError);
-                                        break;
-                            
-                                    case 1:
-                                        resolve(queryResult[0]);
-                                        break;
-                            
-                                    default: // In case more than a single result is returned
-                                        resolve(queryResult[0]);
-                                        break;
-                                }
-                            }
-                            else {
+                    if (queryResult !== undefined) {
+                        switch (queryResult.length) {
+                            case 0:
                                 reject(notFoundError);
-                            }
+                                break;
+                            
+                            case 1:
+                                resolve(queryResult[0]);
+                                break;
+                            
+                            default: // In case more than a single result is returned
+                                resolve(queryResult[0]);
+                                break;
                         }
-                    });
-                })
-                .catch((error: systemError) => {
-                    reject(error);
-                })
+                    }
+                    else {
+                        reject(notFoundError);
+                    }
+                }
+            });
         });
     }
 
