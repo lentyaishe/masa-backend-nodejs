@@ -20,24 +20,22 @@ export class AuthenticationService implements IAuthenticationService {
         private errorService: ErrorService
     ) { }
 
-    public login(login: string, password: string): Promise<jwtUserData> {
-        return new Promise<jwtUserData>((resolve, reject) => {
-            SqlHelper.executeQuerySingleResult<localUser>(this.errorService, Queries.GetUserByLogin, login)
-                .then((user: localUser) => {
-                    if (bcrypt.compareSync(password, user.password)) {
-                        const result: jwtUserData = {
-                            userId: user.id,
-                            roleId: user.role_id
-                        };
-                        resolve(result);
-                    }
-                    else {
-                        reject(this.errorService.getError(AppError.NoData));
-                    }
-                })
-                .catch((error: systemError) => {
-                    reject(error);
-                });
-        });
+    public async login(login: string, password: string): Promise<jwtUserData> {
+        try {
+            const user: localUser = await SqlHelper.executeQuerySingleResult<localUser>(this.errorService, Queries.GetUserByLogin, login)
+            if (bcrypt.compareSync(password, user.password)) {
+                const result: jwtUserData = {
+                    userId: user.id,
+                    roleId: user.role_id
+                };
+                return result;
+            }
+            else {
+                throw (this.errorService.getError(AppError.NoData));
+            }
+        }
+        catch (error: any) {
+            throw (error as systemError);
+        }
     }
 }

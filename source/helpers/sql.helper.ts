@@ -33,37 +33,42 @@ export class SqlHelper {
         });
     }
 
-    public static async executeQuerySingleResult<T>(errorService: ErrorService, query: string, ...params: (string | number)[]): Promise<T> {
+    public static executeQuerySingleResult<T>(errorService: ErrorService, query: string, ...params: (string | number)[]): Promise<T> {
         return new Promise<T>(async (resolve, reject) => {
-            const connection: Connection = await SqlHelper.openConnection(errorService);
+            try {
+                const connection: Connection = await SqlHelper.openConnection(errorService);
 
-            connection.query(query, params, (queryError: Error | undefined, queryResult: T[] | undefined) => {
-                if (queryError) {
-                    reject(errorService.getError(AppError.QueryError));
-                }
-                else {
-                    const notFoundError: systemError = errorService.getError(AppError.NoData);
-                    
-                    if (queryResult !== undefined) {
-                        switch (queryResult.length) {
-                            case 0:
-                                reject(notFoundError);
-                                break;
-                            
-                            case 1:
-                                resolve(queryResult[0]);
-                                break;
-                            
-                            default: // In case more than a single result is returned
-                                resolve(queryResult[0]);
-                                break;
-                        }
+                connection.query(query, params, (queryError: Error | undefined, queryResult: T[] | undefined) => {
+                    if (queryError) {
+                        reject(errorService.getError(AppError.QueryError));
                     }
                     else {
-                        reject(notFoundError);
+                        const notFoundError: systemError = errorService.getError(AppError.NoData);
+                    
+                        if (queryResult !== undefined) {
+                            switch (queryResult.length) {
+                                case 0:
+                                    reject(notFoundError);
+                                    break;
+                            
+                                case 1:
+                                    resolve(queryResult[0]);
+                                    break;
+                            
+                                default: // In case more than a single result is returned
+                                    resolve(queryResult[0]);
+                                    break;
+                            }
+                        }
+                        else {
+                            reject(notFoundError);
+                        }
                     }
-                }
-            });
+                });
+            }
+            catch (error: any) {
+                reject(error as systemError)
+            }
         });
     }
 

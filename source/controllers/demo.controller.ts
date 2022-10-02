@@ -61,22 +61,31 @@ const getWithDelay = async (req: Request, res: Response, next: NextFunction) => 
     // Read the delay in seconds from request parameter
     let delayInSeconds: number = parseInt(req.params.seconds);
 
-    await DemoHelper.WaitXSecondsAsync(delayInSeconds)
-
-    return res.status(200).json({
-        message: `Timeout in ${delayInSeconds} second(s)`
-    });
+    DemoHelper.waitXSeconds(delayInSeconds)
+        .then(() => {
+            return res.status(200).json({
+                message: `Timeout in ${delayInSeconds} second(s)`
+            });
+        })
+        .catch((error) => {
+            return res.sendStatus(400);
+        });
 };
 
 const getWithDelayAsync = async (req: Request, res: Response, next: NextFunction) => {
     // Read the delay in seconds from request parameter
     let delayInSeconds: number = parseInt(req.params.seconds);
 
-    setTimeout(() => {
+    try {
+        await DemoHelper.waitXSecondsAsync(delayInSeconds);
+
         return res.status(200).json({
             message: `Timeout in ${delayInSeconds} second(s)`
         });
-    }, delayInSeconds * 1000);
+    }
+    catch (error) {
+        return res.sendStatus(400);
+    }
 };
 
 const getWithDelayValidated = async (req: Request, res: Response, next: NextFunction) => {

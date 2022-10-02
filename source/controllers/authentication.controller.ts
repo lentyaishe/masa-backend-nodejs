@@ -17,27 +17,27 @@ const authenticationService: AuthenticationService = new AuthenticationService(e
 const login = async (req: Request, res: Response, next: NextFunction) => {
     const user: localUser = req.body;
 
-    authenticationService.login(user.login, user.password)
-        .then((userData: jwtUserData) => {
+    try {
+        const userData: jwtUserData = await authenticationService.login(user.login, user.password);
 
-            const authenticationToken: authenticationToken = {
-                userData: userData
-            };
+        const authenticationToken: authenticationToken = {
+            userData: userData
+        };
             
-            const token: string = jwt.sign(
-                authenticationToken,
-                TOKEN_SECRET,
-                {
-                    expiresIn: "2h",
-                });
-
-            return res.status(200).json({
-                token: token
+        const token: string = jwt.sign(
+            authenticationToken,
+            TOKEN_SECRET,
+            {
+                expiresIn: "2h",
             });
-        })
-        .catch((error: systemError) => {
-            return ResponseHelper.handleError(res, error, true);
+
+        return res.status(200).json({
+            token: token
         });
+    }
+    catch (error: any) {
+        return ResponseHelper.handleError(res, error as systemError, true);
+    }
 };
 
 export default { login };

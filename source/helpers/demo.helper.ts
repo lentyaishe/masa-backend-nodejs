@@ -1,6 +1,6 @@
 export class DemoHelper {
 
-    public static async WaitXSecondsAsync(seconds: number): Promise<void> {
+    public static async waitXSecondsAsync(seconds: number): Promise<void> {
         console.log(`${DemoHelper.timeStamp()}: Starting delay`);
         await setTimeout(() => {
             console.log(`${DemoHelper.timeStamp()}: Delay complete`);
@@ -8,7 +8,7 @@ export class DemoHelper {
         }, seconds);
     }
     
-    private static waitXSeconds(seconds: number): Promise<void> {
+    public static waitXSeconds(seconds: number): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             setTimeout(() => {
                 resolve();
