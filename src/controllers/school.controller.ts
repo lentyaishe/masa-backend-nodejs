@@ -3,11 +3,9 @@ import { NON_EXISTENT_ID } from '../constants';
 import { AuthenticatedRequest, systemError, whiteBoardType } from '../entities';
 import { RequestHelper } from '../helpers/request.helper';
 import { ResponseHelper } from '../helpers/response.helper';
-import { ErrorService } from '../services/error.service';
 import { SchoolService } from '../services/school.service';
 
-const errorService: ErrorService = new ErrorService();
-const schoolService: SchoolService = new SchoolService(errorService);
+const schoolService: SchoolService = new SchoolService();
 
 const getBoardTypes = async (req: Request, res: Response, next: NextFunction) => {
     console.log("User data: ", (req as AuthenticatedRequest).userData);
@@ -23,7 +21,7 @@ const getBoardTypes = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 const getBoardTypeById = async (req: Request, res: Response, next: NextFunction) => {
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
             schoolService.getBoardTypeById(numericParamOrError)
@@ -44,7 +42,7 @@ const getBoardTypeById = async (req: Request, res: Response, next: NextFunction)
 };
 
 const updateBoardTypeById = async (req: Request, res: Response, next: NextFunction) => {
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
             const body: whiteBoardType = req.body;
@@ -115,7 +113,7 @@ const addBoardTypeByStoredProcedureOutput = async (req: Request, res: Response, 
 };
 
 const deleteBoardTypeById = async (req: Request, res: Response, next: NextFunction) => {
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
             schoolService.deleteBoardTypeById(numericParamOrError, (req as AuthenticatedRequest).userData.userId)

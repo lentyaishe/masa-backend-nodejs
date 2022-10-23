@@ -2,7 +2,6 @@ import * as _ from "underscore";
 import { columnDefinition, ColumnType, tableDefinition, TableNames } from "../db-entities";
 import { user } from "../entities";
 import { DbTable } from "./db-table.service";
-import { ErrorService } from "./error.service";
 
 interface localTable<T> {
     table: tableDefinition;
@@ -13,12 +12,11 @@ interface IDbService {
     getFromTableById(tableName: TableNames, id: number): Promise<any>;
 }
 
-export class DbService implements IDbService {
+class DbService implements IDbService {
 
     private _tables: _.Dictionary<any> = {};
 
     constructor(
-        private errorService: ErrorService
     ) {
         this._tables[TableNames.User] = this.addTableToContext<user>(TableNames.User, [{
             dbName: "id",
@@ -51,7 +49,7 @@ export class DbService implements IDbService {
             fields: fields
         };
 
-        let tableInstance: DbTable<T> = new DbTable(this.errorService, tableDefinition);
+        let tableInstance: DbTable<T> = new DbTable(tableDefinition);
 
         let table: localTable<T> = {
             table: tableDefinition,
@@ -61,3 +59,5 @@ export class DbService implements IDbService {
         return table;
     }
 }
+
+export default new DbService();

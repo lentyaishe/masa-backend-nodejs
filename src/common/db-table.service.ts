@@ -1,7 +1,6 @@
 import { map, filter } from "underscore";
 import { columnDefinition, tableDefinition } from "../db-entities";
 import { SqlHelper } from "../helpers/sql.helper";
-import { ErrorService } from "./error.service";
 
 interface IDbTable<T> {
     instanceGenericType: T;
@@ -15,7 +14,6 @@ export class DbTable<T> implements IDbTable<T> {
     private _instanceGenericType: T;
 
     constructor(
-        private errorService: ErrorService,
         table: tableDefinition
     ) {
         this._table = table;
@@ -31,7 +29,7 @@ export class DbTable<T> implements IDbTable<T> {
         let queriedFields: string = map(filter(this._table.fields, (column: columnDefinition) => column.isForOutput), (column: columnDefinition) => column.dbName).join(", ");
         let sql: string = `SELECT ${queriedFields} FROM ${this._table.name} WHERE id = ?`;
 
-        const result: T = await SqlHelper.executeQuerySingleResult<T>(this.errorService, sql, id)
+        const result: T = await SqlHelper.executeQuerySingleResult<T>(sql, id)
 
         // [0] = {first_name = "Demo", id = 2} => {firstName = "Demo", id = 2}
         this._table.fields.forEach((column: columnDefinition) => {

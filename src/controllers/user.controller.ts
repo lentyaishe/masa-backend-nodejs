@@ -6,15 +6,13 @@ import { AuthenticatedRequest, systemError, user } from '../entities';
 import { RequestHelper } from '../helpers/request.helper';
 import { ResponseHelper } from '../helpers/response.helper';
 import { DbService } from "../services/db.service";
-import { ErrorService } from '../services/error.service';
 import { UserService } from '../services/user.service';
 
-const errorService: ErrorService = new ErrorService();
-const userService: UserService = new UserService(errorService);
-const dbService: DbService = new DbService(errorService);
+const userService: UserService = new UserService();
+const dbService: DbService = new DbService();
 
 const getById = async (req: Request, res: Response, next: NextFunction) => {
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
             const result: user = await dbService.getFromTableById(TableNames.User, numericParamOrError);
@@ -55,7 +53,7 @@ const add = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const updateById = async (req: Request, res: Response, next: NextFunction) => {
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
             const body: user = req.body;
@@ -82,7 +80,7 @@ const updateById = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const deleteById = async (req: Request, res: Response, next: NextFunction) => {
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
             userService.deleteById(numericParamOrError, (req as AuthenticatedRequest).userData.userId)

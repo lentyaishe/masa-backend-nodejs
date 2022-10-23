@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from "jsonwebtoken";
-import { ErrorService } from '../services/error.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { authenticationToken, jwtUserData, systemError } from '../entities';
 import { ResponseHelper } from '../helpers/response.helper';
@@ -11,8 +10,7 @@ interface localUser {
     password: string;
 }
 
-const errorService: ErrorService = new ErrorService();
-const authenticationService: AuthenticationService = new AuthenticationService(errorService);
+const authenticationService: AuthenticationService = new AuthenticationService();
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
     const user: localUser = req.body;

@@ -3,7 +3,7 @@ import { Queries } from "../constants";
 import { entityWithId, jwtUserData, systemError } from "../entities";
 import { AppError, Role } from "../enums";
 import { SqlHelper } from "../helpers/sql.helper";
-import { ErrorService } from "./error.service";
+import ErrorService from "../common/error.service";
 
 interface localUser extends entityWithId {
     password: string;
@@ -16,13 +16,11 @@ interface IAuthenticationService {
 
 export class AuthenticationService implements IAuthenticationService {
 
-    constructor(
-        private errorService: ErrorService
-    ) { }
+    constructor() { }
 
     public async login(login: string, password: string): Promise<jwtUserData> {
         try {
-            const user: localUser = await SqlHelper.executeQuerySingleResult<localUser>(this.errorService, Queries.GetUserByLogin, login)
+            const user: localUser = await SqlHelper.executeQuerySingleResult<localUser>(Queries.GetUserByLogin, login)
             if (bcrypt.compareSync(password, user.password)) {
                 const result: jwtUserData = {
                     userId: user.id,
@@ -31,7 +29,7 @@ export class AuthenticationService implements IAuthenticationService {
                 return result;
             }
             else {
-                throw (this.errorService.getError(AppError.NoData));
+                throw (ErrorService.getError(AppError.NoData));
             }
         }
         catch (error: any) {
