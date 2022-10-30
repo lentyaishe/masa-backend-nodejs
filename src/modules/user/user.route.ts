@@ -13,7 +13,7 @@ export class UserRoutes extends RouteConfig {
     public configureRoutes() {
         this.app.route(`/${this.baseUrl}/:id`).get([AuthMiddleware.verifyToken([Role.Administrator]), UserController.getUserById]);
         this.app.route(`/${this.baseUrl}/:id`).put([AuthMiddleware.verifyToken([Role.Administrator]), UserController.updateById]);
-        
+
         return this.app;
     }
 }
