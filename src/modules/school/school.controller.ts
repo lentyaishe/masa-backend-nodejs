@@ -8,7 +8,7 @@ class SchoolController {
 
     constructor() { }
 
-    async getBoardTypes(req: any, res: Response, next: NextFunction) {
+    async getBoardTypes(req: Request, res: Response, next: NextFunction) {
         //console.log("User data: ", (req as AuthenticatedRequest).userData);
         SchoolService.getBoardTypes()
             .then((result: whiteBoardType[]) => {
