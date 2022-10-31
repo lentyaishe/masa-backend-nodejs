@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { RequestHelper } from "../../core/request.helper";
-import { AuthenticatedRequest, systemError, whiteBoardType } from "../../entities";
+import { AuthenticatedRequest, status, systemError, whiteBoardType } from "../../entities";
 import { ResponseHelper } from "../../framework/response.helper";
 import SchoolService from "./school.service";
 
@@ -79,7 +79,29 @@ class SchoolController {
         else {
             return ResponseHelper.handleError(res, numericParamOrError);
         }
+    }
+    
+    async getStatusById(req: Request, res: Response, next: NextFunction) {
+        const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id);
+
+        if (typeof numericParamOrError === "number") {
+            if (numericParamOrError > 0) {
+                SchoolService.getStatusById(numericParamOrError)
+                    .then((result: status) => {
+                        return res.status(200).json(result);
+                    })
+                    .catch((error: systemError) => {
+                        return ResponseHelper.handleError(res, error);
+                    });
+            }
+            else {
+                // TODO: Error handling
+            }
         }
+        else {
+            return ResponseHelper.handleError(res, numericParamOrError);
+        }
+    }
 }
 
 export default new SchoolController();

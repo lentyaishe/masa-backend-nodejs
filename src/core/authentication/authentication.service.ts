@@ -19,6 +19,7 @@ class AuthenticationService implements IAuthenticationService {
     constructor() { }
 
     public async login(login: string, password: string): Promise<jwtUserData> {
+        // OPTION 1:
         try {
             const user: localUser = await SqlHelper.executeQuerySingleResult<localUser>(Queries.GetUserByLogin, login)
             if (bcrypt.compareSync(password, user.password)) {
@@ -35,6 +36,26 @@ class AuthenticationService implements IAuthenticationService {
         catch (error: any) {
             throw (error as systemError);
         }
+
+        // OPTION 2:
+        // return new Promise<jwtUserData>(async (resolve, reject) => {
+        //     try {
+        //         const user: localUser = await SqlHelper.executeQuerySingleResult<localUser>(Queries.GetUserByLogin, login)
+        //         if (bcrypt.compareSync(password, user.password)) {
+        //             const result: jwtUserData = {
+        //                 userId: user.id,
+        //                 roleId: user.role_id
+        //             };
+        //             resolve(result);
+        //         }
+        //         else {
+        //             reject(ErrorService.getError(AppError.NoData));
+        //         }
+        //     }
+        //     catch (error: any) {
+        //         reject(error as systemError);
+        //     }
+        // });
     }
 }
 

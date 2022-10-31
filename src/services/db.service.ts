@@ -1,6 +1,7 @@
 import * as _ from "underscore";
-import { columnDefinition, ColumnType, tableDefinition, TableNames } from "../db-entities";
+import { columnDefinition, tableDefinition } from "../db-entities";
 import { user } from "../entities";
+import { ColumnType, ColumnUpdateType, TableNames } from "../enums";
 import { DbTable } from "./db-table.service";
 import { ErrorService } from "./error.service";
 
@@ -25,14 +26,16 @@ export class DbService implements IDbService {
             name: "id",
             type: ColumnType.Integer,
             isForOutput: true,
-            isQueriable: true
+            isQueriable: true,
+            updateType: ColumnUpdateType.None
         }, {
             dbName: "first_name",
             name: "firstName",
             type: ColumnType.Varchar,
             isForOutput: true,
-            isQueriable: true
-        }]);
+            isQueriable: true,
+            updateType: ColumnUpdateType.Always
+            }]);
     }
 
     public get tables(): _.Dictionary<tableDefinition> {

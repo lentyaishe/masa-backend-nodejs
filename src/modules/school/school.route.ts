@@ -20,6 +20,8 @@ export class SchoolRoutes extends RouteConfig {
         // this.app.route('/board-type-sp-output', middleware.verifyToken([Role.Administrator, Role.RegularUser]), controller.addBoardTypeByStoredProcedureOutput);
         // this.app.route(`/${this.baseUrl}/:id`)).delete([AuthMiddleware.verifyToken([Role.Administrator, Role.RegularUser]), controller.deleteBoardTypeById]);
         // router.delete('/board-type/:id', middleware.verifyToken([Role.Administrator, Role.RegularUser]), controller.deleteBoardTypeById);
+        
+        this.app.route(`/${this.baseUrl}/status/:id`).get([AuthMiddleware.verifyToken([Role.RegularUser]), SchoolController.getStatusById]);
 
         return this.app;
     }

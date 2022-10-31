@@ -1,11 +1,7 @@
 import * as _ from "underscore";
-import { TableNames } from "../../db-entities";
 import { systemError, user } from "../../entities";
 import DbService from "../../core/db.service";
-import { Queries } from "../../constants";
-import { DateHelper } from "../../framework/date.helper";
-import { Status } from "../../enums";
-import { SqlHelper } from "../../core/sql.helper";
+import { TableNames } from "../../enums";
 
 interface IUserService {
     getById(userId: number): Promise<user>;
@@ -15,24 +11,27 @@ interface IUserService {
 }
 
 class UserService implements IUserService {
+    private _serviceTable: TableNames = TableNames.User;
 
     constructor() { }
 
     public async getById(userId: number): Promise<user> {
-        return await DbService.getFromTableById(TableNames.User, userId);
+        try {
+            return await DbService.getFromTableById(this._serviceTable, userId);
+        }
+        catch (error: any) {
+            throw (error as systemError);
+        }
     }
 
-    public updateById(user: user, userId: number): Promise<user> {
-        return new Promise<user>((resolve, reject) => {
-            const updateDate: Date = new Date();
-            SqlHelper.executeQueryNoResult(Queries.UpdateUserById, false, user.firstName, user.lastName, DateHelper.dateToString(updateDate), userId, user.id, Status.Active)
-                .then(() => {
-                    resolve(user);
-                })
-                .catch((error: systemError) => {
-                    reject(error);
-                });
-        });
+    public async updateById(user: user, userId: number): Promise<user> {
+        try {
+            await DbService.updateTableById(this._serviceTable, user.id, user, userId);
+            return user;
+        }
+        catch (error: any) {
+            throw (error as systemError);
+        }
     }
 
     // public add(user: user, userId: number): Promise<user> {

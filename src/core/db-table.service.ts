@@ -1,11 +1,15 @@
 import { map, filter } from "underscore";
 import { columnDefinition, tableDefinition } from "../db-entities";
+import { systemError } from "../entities";
+import { ColumnType, ColumnUpdateType } from "../enums";
+import { DateHelper } from "../framework/date.helper";
 import { SqlHelper } from "./sql.helper";
 
 interface IDbTable<T> {
     instanceGenericType: T;
 
     getById<T>(id: number): Promise<T>;
+    updateById<T>(id: number, original: T, userId: number): Promise<void>;
 }
 
 export class DbTable<T> implements IDbTable<T> {
@@ -33,12 +37,44 @@ export class DbTable<T> implements IDbTable<T> {
 
         // [0] = {first_name = "Demo", id = 2} => {firstName = "Demo", id = 2}
         this._table.fields.forEach((column: columnDefinition) => {
+            (result as any)[column.name] = column.type === ColumnType.Date ? (DateHelper.dateToString((result as any)[column.dbName])) : (result as any)[column.dbName];
             if (column.name !== column.dbName) {
-                (result as any)[column.name] = (result as any)[column.dbName];
                 delete (result as any)[column.dbName];
             }
         });
 
         return result;
+    }
+
+    public async updateById<T>(id: number, original: T, userId: number): Promise<void> {
+        const updatableFields: columnDefinition[] = filter(this._table.fields, (column: columnDefinition) => column.updateType === ColumnUpdateType.Always);
+        const currentDateFields: columnDefinition[] = filter(this._table.fields, (column: columnDefinition) => column.updateType === ColumnUpdateType.CurrentDate);
+        const currentUserFields: columnDefinition[] = filter(this._table.fields, (column: columnDefinition) => column.updateType === ColumnUpdateType.CurrentUser);
+        
+        const currentDateFieldsClause: string = map(currentDateFields, (column: columnDefinition) => `${column.dbName} = ?`).join(", ");
+        const currentUserFieldsClause: string = map(currentUserFields, (column: columnDefinition) => `${column.dbName} = ?`).join(", ");
+        const sql: string = `UPDATE ${this._table.name} SET ${map(updatableFields, (column: columnDefinition) => `${column.dbName} = ?`).join(", ")} ${currentDateFieldsClause ? ", " + currentDateFieldsClause : ""} ${currentUserFieldsClause ? ", " + currentUserFieldsClause : ""} WHERE id = ?`;
+
+        const params: any[] = [];
+        updatableFields.forEach((column: columnDefinition) => {
+            params.push((original as any)[column.name]);
+        });
+
+        currentDateFields.forEach((column: columnDefinition) => {
+            params.push(new Date());
+        });
+
+        currentUserFields.forEach((column: columnDefinition) => {
+            params.push(userId);
+        });
+
+        params.push(id);
+
+        try {
+            await SqlHelper.executeQueryNoResult(sql, false, ...params);
+        }
+        catch (error: any) {
+            throw (error as systemError);
+        }
     }
 }

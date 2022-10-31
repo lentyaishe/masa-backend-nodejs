@@ -17,3 +17,23 @@ export enum AppError {
     InputParameterNotSupplied = "NoParameter",
     DeletionConflict = "DeletionConflict"
 }
+
+export enum ColumnType {
+    Integer = 1,
+    Varchar,
+    Boolean,
+    Date
+}
+
+export enum TableNames {
+    User = "[user]",
+    WhiteBoardType = "[white_board_type]",
+    Status = "[status]"
+}
+
+export enum ColumnUpdateType {
+    None = 1,
+    Always,
+    CurrentDate,
+    CurrentUser
+}

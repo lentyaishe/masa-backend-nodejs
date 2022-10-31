@@ -7,6 +7,11 @@ export interface entityWithId {
 
 export interface whiteBoardType extends entityWithId {
     type: string;
+    createDate?: string;
+    updateDate?: string;
+    createUser?: number;
+    updateUser?: number;
+    statusId?: number;
 }
 
 export interface systemError {
@@ -37,4 +42,13 @@ export interface user extends entityWithId {
     lastName: string;
     login?: string;
     password?: string;
+    createDate?: string;
+    updateDate?: string;
+    createUser?: number;
+    updateUser?: number;
+    statusId?: number;
+}
+
+export interface status extends entityWithId {
+    statusName: string;
 }
