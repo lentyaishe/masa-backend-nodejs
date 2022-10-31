@@ -1,3 +1,5 @@
+import authenticationController from "./core/authentication/authentication.controller";
+
 export class SqlParameters {
     public static Id: string = "id";
 }
@@ -25,8 +27,4 @@ export class StoredProcedures {
     public static AddWhiteBoardTypeOutput: string = "sp_create_board_type_output";
 }
 
-// export const DB_CONNECTION_STRING: string = "server=.;Database=masa_school;Trusted_Connection=Yes;Driver={SQL Server Native Client 11.0}";
-export const DB_CONNECTION_STRING: string = "server=.;Database=masa_school;Trusted_Connection=Yes;Driver={ODBC Driver 17 for SQL Server}";
 export const NON_EXISTENT_ID: number = -1;
-export const TOKEN_SECRET: string = "b8dc29d7-7711-4cd4-b54a-e21bf25dd253";
-export const DEFAULT_LOG_FOLDER: string = "logs";
