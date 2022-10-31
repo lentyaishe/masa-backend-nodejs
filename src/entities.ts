@@ -52,3 +52,10 @@ export interface user extends entityWithId {
 export interface status extends entityWithId {
     statusName: string;
 }
+
+export interface environment {
+    dbConnectionString: string;
+    tokenSecret: string;
+    logsFolder: string;
+    serverPort: number;
+}

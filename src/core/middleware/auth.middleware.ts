@@ -1,8 +1,8 @@
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { Request, Response, NextFunction } from "express"
-import { TOKEN_SECRET } from "../../constants";
 import { AuthenticatedRequest, jwtUserData } from "../../entities";
 import { Role } from "../../enums";
+import { StaticEnvironment } from "../environment.static";
 
 interface jwtBase {
     userData: jwtUserData;
@@ -22,7 +22,7 @@ class AuthMiddleware {
         try {
             // 'Bearer ..............'
             token = token.substring("Bearer ".length);
-            const decoded: string | JwtPayload = jwt.verify(token, TOKEN_SECRET);
+            const decoded: string | JwtPayload = jwt.verify(token, StaticEnvironment.tokenSecret);
             if (roles.indexOf((decoded as jwtBase).userData.roleId) === -1) {
                 return res.sendStatus(401);
             }

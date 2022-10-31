@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { TOKEN_SECRET } from "../../constants";
 import { jwtUserData, systemError, authenticationToken } from "../../entities";
 import { ResponseHelper } from "../../framework/response.helper";
+import { StaticEnvironment } from "../environment.static";
 import AuthenticationService from "./authentication.service";
 
 interface localUser {
@@ -29,7 +29,7 @@ class Authenticationontroller {
 
             const token: string = jwt.sign(
                 authenticationToken,
-                TOKEN_SECRET,
+                StaticEnvironment.tokenSecret,
                 {
                     expiresIn: "2h",
                 });

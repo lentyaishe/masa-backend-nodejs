@@ -4,7 +4,7 @@ import { ErrorService } from '../services/error.service';
 import { AuthenticationService } from '../services/authentication.service';
 import { authenticationToken, jwtUserData, systemError } from '../entities';
 import { ResponseHelper } from '../helpers/response.helper';
-import { TOKEN_SECRET } from '../constants';
+import { StaticEnvironment } from '../core/environment.static';
 
 interface localUser {
     login: string;
@@ -26,7 +26,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
             
         const token: string = jwt.sign(
             authenticationToken,
-            TOKEN_SECRET,
+            StaticEnvironment.tokenSecret as string,
             {
                 expiresIn: "2h",
             });
