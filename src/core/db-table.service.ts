@@ -60,11 +60,11 @@ export class DbTable<T> implements IDbTable<T> {
             params.push((original as any)[column.name]);
         });
 
-        currentDateFields.forEach((column: columnDefinition) => {
+        currentDateFields.forEach(() => {
             params.push(new Date());
         });
 
-        currentUserFields.forEach((column: columnDefinition) => {
+        currentUserFields.forEach(() => {
             params.push(userId);
         });
 
