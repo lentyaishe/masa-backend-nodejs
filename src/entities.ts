@@ -1,17 +1,46 @@
 import { Request } from 'express';
-import { AppError, Role } from "./enums";
+import { AppError, Role, Status } from "./enums";
 
 export interface entityWithId {
     id: number;
 }
 
-export interface whiteBoardType extends entityWithId {
-    type: string;
+export interface entityBase extends entityWithId {
     createDate?: string;
     updateDate?: string;
-    createUser?: number;
-    updateUser?: number;
-    statusId?: number;
+    createUser?: user;
+    updateUser?: user;
+    statusId?: Status;
+}
+
+export interface whiteBoardType extends entityBase {
+    type: string;
+    createUserId?: number; // backward compatibility
+    updateUserId?: number; // backward compatibility
+}
+
+export interface classRoom extends entityBase {
+    roomNumber: number;
+    roomFloor: number;
+    hasProjector: boolean;
+    whiteBoardType: whiteBoardType;
+}
+
+export interface teacher extends entityWithId {
+    firstName: string;
+    lastName: string;
+    birthdate: Date;
+    isMale: boolean;
+    graduations: teacherGradution[];
+}
+
+export interface profession extends entityWithId {
+    title: string;
+}
+
+export interface teacherGradution {
+    profession: profession;
+    graduationYear: number;
 }
 
 export interface systemError {

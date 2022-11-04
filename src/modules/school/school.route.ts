@@ -21,6 +21,13 @@ export class SchoolRoutes extends RouteConfig {
         // this.app.route(`/${this.baseUrl}/:id`)).delete([AuthMiddleware.verifyToken([Role.Administrator, Role.RegularUser]), controller.deleteBoardTypeById]);
         // router.delete('/board-type/:id', middleware.verifyToken([Role.Administrator, Role.RegularUser]), controller.deleteBoardTypeById);
         
+        this.app.route(`/${this.baseUrl}/room/:id`).get([AuthMiddleware.verifyToken([Role.RegularUser]), SchoolController.getRoomById]);
+        this.app.route(`/${this.baseUrl}/room`).post([AuthMiddleware.verifyToken([Role.RegularUser]), SchoolController.addRoom]);
+        this.app.route(`/${this.baseUrl}/room/:id`).put([AuthMiddleware.verifyToken([Role.RegularUser]), SchoolController.updateRoomById]);
+        
+        this.app.route(`/${this.baseUrl}/teacher/:id`).get([AuthMiddleware.verifyToken([Role.RegularUser]), SchoolController.getTeacherById]);
+        this.app.route(`/${this.baseUrl}/teacher/:id`).put([AuthMiddleware.verifyToken([Role.RegularUser]), SchoolController.updateTeacherById]);
+        
         this.app.route(`/${this.baseUrl}/status/:id`).get([AuthMiddleware.verifyToken([Role.RegularUser]), SchoolController.getStatusById]);
 
         return this.app;
