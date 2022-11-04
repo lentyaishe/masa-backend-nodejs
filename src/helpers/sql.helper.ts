@@ -1,5 +1,5 @@
 import { Connection, SqlClient, Error, Query, ProcedureManager } from "msnodesqlv8";
-import { DB_CONNECTION_STRING, Queries } from "../constants";
+import { Queries } from "../constants";
 import { entityWithId, systemError } from "../entities";
 import { AppError } from "../enums";
 import { ErrorService } from "../services/error.service";

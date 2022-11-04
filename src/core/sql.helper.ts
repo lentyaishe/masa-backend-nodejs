@@ -72,7 +72,7 @@ export class SqlHelper {
         });
     }
 
-    public static executeQueryNoResult(query: string, ignoreNoRowsAffected: boolean, ...params: (string | number)[]): Promise<void> {
+    public static executeQueryNoResult(query: string, ignoreNoRowsAffected: boolean, ...params: (string | number | boolean)[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             SqlHelper.openConnection()
                 .then((connection: Connection) => {
@@ -117,7 +117,7 @@ export class SqlHelper {
         });
     }
 
-    public static createNew(query: string, original: entityWithId, ...params: (string | number)[]): Promise<entityWithId> {
+    public static createNew(query: string, original: entityWithId, ...params: (string | number | boolean)[]): Promise<entityWithId> {
         return new Promise<entityWithId>((resolve, reject) => {
             SqlHelper.openConnection()
                 .then((connection: Connection) => {
@@ -199,7 +199,7 @@ export class SqlHelper {
 
     private static openConnection(): Promise<Connection> {
         return new Promise<Connection>((resolve, reject) => {
-            SqlHelper.sql.open(StaticEnvironment.environment.dbConnectionString, (connectionError: Error, connection: Connection) => {
+            SqlHelper.sql.open(StaticEnvironment.dbConnectionString, (connectionError: Error, connection: Connection) => {
                 if (connectionError) {
                     reject(ErrorService.getError(AppError.ConnectionError));
                 }
